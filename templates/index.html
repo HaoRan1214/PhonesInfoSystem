@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手机管理系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.5.7/css/layui.min.css">
+    <script src="https://cdn.staticfile.org/layui/2.5.7/layui.min.js"></script>
+</head>
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <h1 style="text-align: center">手机信息管理系统</h1>
+                <h2 style="text-align: center">Python+HTML</h2>
+                <!-- 导航链接按钮 -->
+                <a href="/add" class="layui-btn layui-btn-normal layui-btn-radius">添加</a>
+                <a href="/echarts" class="layui-btn layui-btn-warm layui-btn-radius">价格图表</a>
+                <a href="/vote" class="layui-btn layui-btn-radius" style="background-color: rgb(81, 0, 255, 0.247);">手机投票</a>
+                <!-- 排序按钮 -->
+                <button class="layui-btn layui-btn-radius" style="background-color: rgb(255, 0, 208);" onclick="sortTable('id')">按ID排序</button>
+                <button class="layui-btn layui-btn-radius" style="background-color: rgb(255, 0, 208);" onclick="sortTable('price')">按价格排序</button>
+                <a href="{{ url_for('logout') }}" class="layui-btn layui-btn-danger layui-btn-radius">退出</a>
+                <table class="layui-table" id="phoneTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>品牌</th>
+                            <th>型号</th>
+                            <th>价格</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phone in phones %}
+                        <tr>
+                            <td>{{ phone.id }}</td>
+                            <td>{{ phone.brand }}</td>
+                            <td>{{ phone.model }}</td>
+                            <td>{{ phone.price }}</td>
+                            <td>
+                                <a href="{{ url_for('edit', id=phone.id) }}" class="layui-btn layui-btn-radius">修改</a>
+                                <a href="{{ url_for('delete', id=phone.id) }}" class="layui-btn layui-btn-danger layui-btn-radius" onclick="return confirmDelete()">删除</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- JavaScript 脚本 -->
+<script>
+    // 初始化排序顺序变量
+    var idSortOrder = 'desc';
+    var priceSortOrder = 'desc';
+    
+     // 确认删除操作
+    function confirmDelete() {
+        return confirm("确定删除吗？");
+    }
+
+    // 表格排序sortTable函数
+    function sortTable(column) {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("phoneTable");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.getElementsByTagName("tr");
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("td")[column === 'id' ? 0 : 3].innerText;
+                y = rows[i + 1].getElementsByTagName("td")[column === 'id' ? 0 : 3].innerText;
+                if (column === 'id') {
+                    if (idSortOrder === 'desc') {
+                        if (parseInt(x) < parseInt(y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else {
+                        if (parseInt(x) > parseInt(y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                } else if (column === 'price') {
+                    if (priceSortOrder === 'desc') {
+                        if (parseFloat(x) < parseFloat(y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else {
+                        if (parseFloat(x) > parseFloat(y)) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+
+        // 切换排序顺序
+        if (column === 'id') {
+            idSortOrder = idSortOrder === 'desc' ? 'asc' : 'desc';
+        } else if (column === 'price') {
+            priceSortOrder = priceSortOrder === 'desc' ? 'asc' : 'desc';
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>手机价格</title>
+    <!-- 引入 ECharts 绘图库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.5.7/css/layui.min.css">
+    <script src="https://cdn.staticfile.org/layui/2.5.7/layui.min.js"></script>
+     <!-- 设置页面样式 -->
+    <style>
+        #main {
+              width: 600px;
+              height: 400px;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+</div>
+    <!-- 返回首页的按钮 -->
+    <a href="/index" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 50px;">
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal">
+            <i class="layui-icon layui-icon-left"></i>
+        </button>
+    </a>
+
+    <!-- ECharts 图表容器 -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <!-- JavaScript 脚本 -->
+    <script type="text/javascript">
+    // 获取从后端传递过来的手机数据
+    var phone = {{ phones | tojson | safe }};
+    // 将手机数据转换为图表数据格式
+    var chartData = JSON.parse(phone).map(function(phone) {
+        return { name: phone.model, value: phone.price };
+    });
+    // 初始化 ECharts 图表对象
+    var myChart= echarts.init(document.getElementById('main'));
+    // 设置图表参数
+    var option = {
+        title: {
+            text: '手机价格图表'
+        },
+        tooltip: {},
+        xAxis: {
+            type: 'category',
+            data: chartData.map(function(item) { return item.name; }), // x轴坐标为手机型号
+            axisLabel: {
+                interval: 0,
+                rotate: 30 // 旋转30度
+            }
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            name: '价格',
+            data: chartData.map(function(item) { return item.value; }), // y轴坐标为手机价格
+            type: 'bar'
+        }]
+    };
+    // 使用设置的参数绘制图表
+    myChart.setOption(option);
+</script>
+</body>
+</html>
